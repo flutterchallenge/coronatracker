@@ -136,10 +136,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _globalEffectLineChart(AsyncSnapshot snapshot) {
+  _globalEffectLineChart(AsyncSnapshot<List<charts.Series<TimeSeriesCoronaStat, DateTime>>> snapshot) {
     return snapshot == null ? Center( child: CircularProgressIndicator(),) : snapshot.hasError ? Text(snapshot.error.toString()) :
     charts.TimeSeriesChart(
-      seriesList,
+      snapshot.data,
       animate: animate,
       // Configure the default renderer as a line renderer. This will be used
       // for any series that does not define a rendererIdKey.
@@ -159,7 +159,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _topCountryWithDailyNewCases() {}
 
   Future<List<charts.Series<TimeSeriesCoronaStat, DateTime>>> _getTimeSeriesData() {
     return http.get(Constants.BASE_URL + "/timeseries?days=30").then(
@@ -258,24 +257,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
             FutureBuilder(
               initialData: null,
-              future: _getGlobalData(),
+              future: _getTimeSeriesData(),
               builder: (context, snapshot) {
-                return _globalCountView(snapshot);
-              },
-            ),
-            SizedBox(
-              height: 8.0,
-            ),
-            Text(
-              "Top countiries with recovered",
-              style:  Theme.of(context).textTheme.title,
-            ),
-            SizedBox(height: 8.0,),
-            FutureBuilder(
-              initialData: null,
-              future: _getGlobalData(),
-              builder: (context, snapshot) {
-                return _globalCountView(snapshot);
+                return _globalEffectLineChart(snapshot);
               },
             ),
             SizedBox(
@@ -289,12 +273,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'All Country',
-        child: Icon(Icons.all_out),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),// This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
