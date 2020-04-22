@@ -5,9 +5,11 @@ class Constants {
 
   static DateTime stringToDateTime(String dateTime, String format) {
     try {
-      return DateFormat(format).parse(dateTime);
+      DateTime time =  DateFormat(format).parse(dateTime);
+      print("year = ${time.year}, month = ${time.month}, day = ${time.day}");
+      return time;
     } catch(e) {
-
+      print("error, ${e.toString()}");
     }
   }
 }

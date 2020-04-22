@@ -14,15 +14,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'CoronaTracker',
       theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.red,
           textTheme: TextTheme(
             headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-            title: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+            title: TextStyle(fontSize: 18.0, fontStyle: FontStyle.italic),
             body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
           )),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'CoronaTracker'),
     );
   }
 }
@@ -43,7 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _globalCountView(AsyncSnapshot snapshot) {
     return Container(
-      height: 90.0,
+      height: 120.0,
+      padding: EdgeInsets.all(16.0),
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[
@@ -52,24 +53,28 @@ class _MyHomePageState extends State<MyHomePage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0)),
             child: snapshot == null ? Center(child: CircularProgressIndicator(),): snapshot.hasError ? Center(child: Text(snapshot.error.toString()),):
-            Column(
-              children: <Widget>[
-                Text(
-                  "Total Confirmed",
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  "",
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Total Confirmed",
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    "${snapshot.data.totalConfirmed}",
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(
@@ -80,24 +85,28 @@ class _MyHomePageState extends State<MyHomePage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0)),
             child: snapshot == null ? Center(child: CircularProgressIndicator(),): snapshot.hasError ? Center(child: Text(snapshot.error.toString()),):
-            Column(
-              children: <Widget>[
-                Text(
-                  "Total Recovered",
-                  style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  "",
-                  style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Total Recovered",
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    "${snapshot.data.totalRecovered}",
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(
@@ -108,24 +117,28 @@ class _MyHomePageState extends State<MyHomePage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0)),
             child: snapshot == null ? Center(child: CircularProgressIndicator(),): snapshot.hasError ? Center(child: Text(snapshot.error.toString()),):
-            Column(
-              children: <Widget>[
-                Text(
-                  "Total Death",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  "",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Total Death",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.0),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    "${snapshot.data.totalDeaths}",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(
@@ -140,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return snapshot == null ? Center( child: CircularProgressIndicator(),) : snapshot.hasError ? Text(snapshot.error.toString()) :
     charts.TimeSeriesChart(
       snapshot.data,
-      animate: animate,
+      animate: false,
       // Configure the default renderer as a line renderer. This will be used
       // for any series that does not define a rendererIdKey.
       //
@@ -160,42 +173,42 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
-  Future<List<charts.Series<TimeSeriesCoronaStat, DateTime>>> _getTimeSeriesData() {
+  Future<List<charts.Series<TimeSeriesCoronaStat, DateTime>>> _getTimeSeriesData() async {
     return http.get(Constants.BASE_URL + "/timeseries?days=30").then(
         (response) {
           Map<String, dynamic> responseMap = jsonDecode(response.body);
           Map<String, dynamic> casesMap = responseMap["cases"];
           Map<String, dynamic> recoveredMap = responseMap["recovered"];
           Map<String, dynamic> deathsMap = responseMap["deaths"];
-
-          List casesList = [];
-          casesMap.forEach((key, value) => casesList.add(new TimeSeriesCoronaStat(Constants.stringToDateTime(key, "d/M/YY"), value)));
-          List recoveredList = [];
-          recoveredMap.forEach((key, value) => recoveredList.add(new TimeSeriesCoronaStat(Constants.stringToDateTime(key, "d/M/YY"), value));
-          List deathList = [];
-          deathsMap.forEach((key, value) => deathList.add(new TimeSeriesCoronaStat(Constants.stringToDateTime(key, "d/M/YY"), value));
-
+          print(casesMap.toString());
+          List<TimeSeriesCoronaStat> casesList = [];
+          casesMap.forEach((key, value) => casesList.add(new TimeSeriesCoronaStat(Constants.stringToDateTime(key, "M/d/yyyy"), value)));
+          List<TimeSeriesCoronaStat> recoveredList = [];
+          recoveredMap.forEach((key, value) => recoveredList.add(new TimeSeriesCoronaStat(Constants.stringToDateTime(key, "M/d/yyyy"), value)));
+          List<TimeSeriesCoronaStat> deathList = [];
+          deathsMap.forEach((key, value) => deathList.add(new TimeSeriesCoronaStat(Constants.stringToDateTime(key, "M/d/yyyy"), value)));
+          print("caselist size = ${casesList.length}, deathlist size = ${deathList.length}, recovered length = ${recoveredList.length}");
           return [
             new charts.Series<TimeSeriesCoronaStat, DateTime>(
               id: 'Recovered',
               colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
               domainFn: (TimeSeriesCoronaStat stat, _) => stat.time,
               measureFn: (TimeSeriesCoronaStat recovered, _) => recovered.count,
-              data: recoveredList,
+              data: recoveredList??[],
             ),
             new charts.Series<TimeSeriesCoronaStat, DateTime>(
               id: 'Deaths',
               colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
               domainFn: (TimeSeriesCoronaStat stat, _) => stat.time,
               measureFn: (TimeSeriesCoronaStat death, _) => death.count,
-              data: deathList,
+              data: deathList??[],
             ),
             new charts.Series<TimeSeriesCoronaStat, DateTime>(
                 id: 'Cases',
                 colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
                 domainFn: (TimeSeriesCoronaStat stat, _) => stat.time,
                 measureFn: (TimeSeriesCoronaStat cases, _) => cases.count,
-                data: casesList)
+                data: casesList??[])
             // Configure our custom point renderer for this series.
               ..setAttribute(charts.rendererIdKey, 'customPoint'),
           ];
@@ -204,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  _getGlobalData() {
+  Future<TodayData> _getGlobalData() {
     return http.get(Constants.BASE_URL + "/count").then((response) {
       return TodayData.fromJson(jsonDecode(response.body));
     }, onError: (error) {
@@ -231,37 +244,41 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text("Corona Tracker"),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            FutureBuilder(
-              initialData: null,
-              future: _getGlobalData(),
-              builder: (context, snapshot) {
-                return _globalCountView(snapshot);
-              },
-            ),
-            SizedBox(
-              height: 8.0,
-            ),
-            Text(
-              "Outbreak trend over time",
-              style:  Theme.of(context).textTheme.title,
-            ),
-            SizedBox(height: 8.0,),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              FutureBuilder(
+                future: _getGlobalData(),
+                builder: (context, snapshot) {
+                  return _globalCountView(snapshot);
+                },
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              Text(
+                "Outbreak trend over time",
+                style:  Theme.of(context).textTheme.title,
+              ),
+              SizedBox(height: 8.0,),
 
-            FutureBuilder(
-              initialData: null,
-              future: _getTimeSeriesData(),
-              builder: (context, snapshot) {
-                return _globalEffectLineChart(snapshot);
-              },
-            ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 250.0,
+                child: FutureBuilder(
+                  future: _getTimeSeriesData(),
+                  builder: (context, snapshot) {
+                    return _globalEffectLineChart(snapshot);
+                  },
+                ),
+              ),
             SizedBox(
               height: 8.0,
             ),
@@ -271,7 +288,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SizedBox(height: 8.0,),
 
-          ],
+            ],
+          ),
         ),
       ),// This trailing comma makes auto-formatting nicer for build methods.
     );
