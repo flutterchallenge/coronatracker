@@ -225,6 +225,25 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  _allCountryWidget(List<CountryData> countryDataList) {
+    return DataTable(
+      columns: [
+        DataColumn(label: Text('Country')),
+        DataColumn(label: Text('Cases')),
+        DataColumn(label: Text('Death')),
+        DataColumn(label: Text('Recovered')),
+
+      ],
+      rows: List<DataRow>.generate(countryDataList.length, (index) {
+        CountryData cd = countryDataList[index];
+        return DataRow(cells: [
+        DataCell(Text(cd.country)),
+          DataCell(Text("${cd.cases}")),
+          DataCell(Text("${cd.deaths}")),
+          DataCell(Text("${cd.recovered}")),
+        ]); }));
+  }
+
   _getAllCountryData() {
     return http.get(Constants.BASE_URL + "/stat").then((response) {
       List allData =  jsonDecode(response.body);
@@ -287,7 +306,13 @@ class _MyHomePageState extends State<MyHomePage> {
               style:  Theme.of(context).textTheme.title,
             ),
             SizedBox(height: 8.0,),
-
+             FutureBuilder(future: _getAllCountryData(), builder: (context, snapshot) {
+               if(snapshot != null) {
+                 return _allCountryWidget(snapshot.data);
+               } else {
+                 return Container();
+               }
+             },)
             ],
           ),
         ),
